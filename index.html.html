@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PaisaClear — Know where your money goes</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --void:#090d1a;--void2:#0e1528;--void3:#141c33;
+  --surface:#1a2340;--surface2:#212c4a;
+  --rim:#2a3760;--rim2:#344580;
+  --gold:#c9a84c;--gold2:#e8c87a;--gold3:#f5e4b0;
+  --teal:#1fb8a0;--red:#e05c6a;--green:#2eb87a;
+  --muted:#6b7a9e;--text:#e8eaf2;--text2:#b0b8d0;
+  --r:14px;--r-sm:8px;
+}
+body{font-family:'Outfit',sans-serif;background:var(--void);color:var(--text);min-height:100vh}
+h1,h2,.brand{font-family:'Playfair Display',serif}
+nav{display:flex;align-items:center;justify-content:space-between;padding:1.1rem 2.5rem;border-bottom:1px solid var(--rim);background:var(--void)}
+.brand{font-size:1.4rem;font-weight:700;letter-spacing:-0.5px;color:var(--text)}
+.brand span{color:var(--gold)}
+.nav-badge{font-size:11px;font-family:'Outfit',sans-serif;font-weight:600;background:var(--gold);color:var(--void);padding:3px 10px;border-radius:20px;letter-spacing:.5px}
+#upload-screen{display:block}
+.hero-wrap{display:grid;grid-template-columns:1fr 1fr;min-height:calc(100vh - 60px);max-width:1100px;margin:0 auto;padding:0 2.5rem;gap:3rem;align-items:center}
+@media(max-width:720px){.hero-wrap{grid-template-columns:1fr;padding:3rem 1.5rem}}
+.eyebrow{font-size:11px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--gold);margin-bottom:1.25rem;display:flex;align-items:center;gap:8px}
+.eyebrow-line{width:28px;height:1px;background:var(--gold)}
+.hero-title{font-size:clamp(2.2rem,4vw,3.4rem);font-weight:800;line-height:1.1;letter-spacing:-1px;color:var(--text);margin-bottom:1.25rem}
+.hero-title em{font-style:normal;color:var(--gold)}
+.hero-sub{font-size:1rem;color:var(--text2);line-height:1.75;margin-bottom:2.5rem;font-weight:300;max-width:420px}
+.drop-zone{border:1px solid var(--rim2);border-radius:var(--r);padding:2.5rem 2rem;background:var(--surface);cursor:pointer;transition:all .2s;position:relative;text-align:center}
+.drop-zone:hover,.drop-zone.drag{border-color:var(--gold);background:var(--surface2)}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.drop-icon{width:56px;height:56px;border-radius:50%;background:var(--void3);border:1px solid var(--rim2);display:flex;align-items:center;justify-content:center;margin:0 auto 1rem;font-size:22px}
+.drop-title{font-family:'Playfair Display',serif;font-size:1.1rem;font-weight:700;margin-bottom:.4rem;color:var(--text)}
+.drop-sub{font-size:.82rem;color:var(--muted);line-height:1.6}
+.bank-row{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin-top:1.25rem}
+.bank-chip{font-size:11px;font-weight:500;padding:3px 10px;border-radius:20px;border:1px solid var(--rim2);color:var(--text2);background:var(--void3)}
+.privacy-note{font-size:.75rem;color:var(--muted);margin-top:1rem}
+.hero-right{display:flex;justify-content:center;align-items:center}
+.phone-frame{width:260px;border-radius:36px;border:2px solid var(--rim2);background:var(--surface);overflow:hidden}
+.phone-notch{width:80px;height:24px;background:var(--void);border-radius:0 0 16px 16px;margin:0 auto}
+.phone-screen{padding:16px}
+.ps-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.ps-name{font-size:11px;font-weight:600;color:var(--text2)}
+.ps-month{font-size:10px;color:var(--muted)}
+.ps-balance-label{font-size:10px;color:var(--muted);margin-bottom:3px}
+.ps-balance{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700;color:var(--gold);letter-spacing:-0.5px}
+.ps-divider{height:1px;background:var(--rim);margin:12px 0}
+.ps-mini-bars{display:flex;align-items:flex-end;gap:5px;height:48px;margin-bottom:12px}
+.ps-bar{border-radius:3px 3px 0 0;flex:1}
+.ps-cats{display:flex;flex-direction:column;gap:7px}
+.ps-cat{display:flex;align-items:center;gap:8px}
+.ps-cat-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.ps-cat-name{font-size:10px;color:var(--text2);flex:1}
+.ps-cat-bar-bg{flex:2;height:4px;background:var(--void3);border-radius:2px;overflow:hidden}
+.ps-cat-fill{height:100%;border-radius:2px}
+.ps-cat-amt{font-size:10px;color:var(--text);font-weight:500;min-width:36px;text-align:right}
+.ps-insight{margin-top:12px;padding:8px 10px;background:var(--void3);border-radius:var(--r-sm);border-left:2px solid var(--gold)}
+.ps-insight-text{font-size:10px;color:var(--text2);line-height:1.5}
+.ps-insight-text strong{color:var(--gold);font-weight:600}
+#loading-screen{display:none;max-width:460px;margin:0 auto;padding:6rem 2rem;text-align:center}
+.spin-ring{width:60px;height:60px;border:2px solid var(--rim2);border-top-color:var(--gold);border-radius:50%;animation:spin .9s linear infinite;margin:0 auto 2rem}
+@keyframes spin{to{transform:rotate(360deg)}}
+.load-title{font-family:'Playfair Display',serif;font-size:1.3rem;margin-bottom:.5rem;color:var(--text)}
+.load-sub{font-size:.88rem;color:var(--muted);margin-bottom:2rem}
+.steps{list-style:none;display:inline-block;text-align:left}
+.steps li{font-size:.88rem;color:var(--muted);padding:6px 0;display:flex;align-items:center;gap:10px}
+.steps li.done{color:var(--green)}.steps li.active{color:var(--text);font-weight:500}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--rim2);flex-shrink:0}
+.steps li.done .sdot{background:var(--green)}.steps li.active .sdot{background:var(--gold);animation:blink 1s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+#dashboard-screen{display:none;max-width:960px;margin:0 auto;padding:2rem 2rem 4rem}
+.dash-top{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:2rem;flex-wrap:wrap;gap:1rem}
+.dash-h1{font-size:1.8rem;font-weight:800;letter-spacing:-0.5px;color:var(--text)}
+.dash-period{font-size:.88rem;color:var(--muted);margin-top:4px}
+.btn-reset{font-family:'Outfit',sans-serif;font-size:.82rem;font-weight:500;padding:9px 20px;border-radius:var(--r-sm);background:var(--surface);border:1px solid var(--rim2);color:var(--text2);cursor:pointer;transition:all .15s}
+.btn-reset:hover{border-color:var(--gold);color:var(--gold)}
+.sum-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:1.75rem}
+.sum-card{background:var(--surface);border:1px solid var(--rim);border-radius:var(--r);padding:1.1rem 1.25rem}
+.sum-lbl{font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.sum-val{font-family:'Playfair Display',serif;font-size:1.6rem;font-weight:700}
+.sum-val.inc{color:var(--teal)}.sum-val.exp{color:var(--red)}.sum-val.sav{color:var(--gold)}.sum-val.neu{color:var(--text)}
+.sum-note{font-size:11px;color:var(--muted);margin-top:4px}
+.ai-card{background:var(--surface);border:1px solid var(--gold);border-radius:var(--r);padding:1.25rem 1.5rem;display:flex;gap:14px;align-items:flex-start;margin-bottom:1.75rem}
+.ai-badge{width:38px;height:38px;border-radius:50%;background:var(--gold);color:var(--void);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:13px;font-weight:700;flex-shrink:0}
+.ai-body{font-size:.9rem;line-height:1.7;color:var(--text2)}
+.ai-body strong{color:var(--text);font-weight:600}
+.chips-row{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:1.75rem}
+.chip{background:var(--surface);border:1px solid var(--rim);border-radius:var(--r-sm);padding:10px 14px;flex:1;min-width:180px}
+.chip-icon{font-size:16px;margin-bottom:6px;display:block}
+.chip-title{font-size:.85rem;font-weight:600;color:var(--text);margin-bottom:2px}
+.chip-detail{font-size:.78rem;color:var(--muted);line-height:1.5}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+@media(max-width:600px){.two-col{grid-template-columns:1fr}}
+.panel{background:var(--surface);border:1px solid var(--rim);border-radius:var(--r);padding:1.25rem}
+.panel-title{font-size:11px;font-weight:600;color:var(--muted);letter-spacing:1.2px;text-transform:uppercase;margin-bottom:1rem}
+.cat-row{margin-bottom:13px}
+.cat-top{display:flex;justify-content:space-between;margin-bottom:5px;font-size:.83rem}
+.cat-name{font-weight:500;color:var(--text)}.cat-amt{color:var(--text2)}
+.bar-bg{height:5px;background:var(--void3);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width 1.2s ease}
+.txn-list{list-style:none}
+.txn{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--rim)}
+.txn:last-child{border:none}
+.txn-ico{width:34px;height:34px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0}
+.txn-info{flex:1;min-width:0}
+.txn-name{font-size:.83rem;font-weight:500;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.txn-meta{font-size:11px;color:var(--muted);margin-top:2px}
+.txn-amt{font-size:.85rem;font-weight:600;flex-shrink:0}
+.txn-amt.dr{color:var(--red)}.txn-amt.cr{color:var(--teal)}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:110px;margin-top:.5rem}
+.bw{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;height:100%;justify-content:flex-end}
+.bbar{width:100%;border-radius:4px 4px 0 0;min-height:4px;transition:height 1.2s ease}
+.blbl{font-size:10px;color:var(--muted)}.bval{font-size:10px;font-weight:500;color:var(--text2)}
+</style>
+</head>
+<body>
+<nav>
+  <div class="brand">Paisa<span>Clear</span></div>
+  <span class="nav-badge">MVP BETA</span>
+</nav>
+
+<div id="upload-screen">
+  <div class="hero-wrap">
+    <div class="hero-left">
+      <p class="eyebrow"><span class="eyebrow-line"></span>Bank Statement Analyser</p>
+      <h1 class="hero-title">Finally know where your <em>salary disappears</em></h1>
+      <p class="hero-sub">Upload your bank statement. AI reads every transaction, categorises spends, and explains your money in plain language. No login. No bank sync.</p>
+      <div class="drop-zone" id="dropzone">
+        <input type="file" id="file-input" accept=".pdf,.csv">
+        <div class="drop-icon">📄</div>
+        <p class="drop-title">Drop your bank statement here</p>
+        <p class="drop-sub">PDF or CSV &nbsp;·&nbsp; Works with all Indian banks<br>Your file never leaves your browser</p>
+        <div class="bank-row">
+          <span class="bank-chip">SBI</span><span class="bank-chip">HDFC</span><span class="bank-chip">ICICI</span>
+          <span class="bank-chip">Axis</span><span class="bank-chip">Kotak</span><span class="bank-chip">PNB</span>
+        </div>
+        <p class="privacy-note">Free during beta &nbsp;·&nbsp; No account needed &nbsp;·&nbsp; 100% private</p>
+      </div>
+    </div>
+    <div class="hero-right">
+      <div class="phone-frame">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="ps-header"><span class="ps-name">Amit S.</span><span class="ps-month">April 2025</span></div>
+          <p class="ps-balance-label">Total saved this month</p>
+          <p class="ps-balance">₹26,260</p>
+          <div class="ps-divider"></div>
+          <div class="ps-mini-bars">
+            <div class="ps-bar" style="height:55%;background:#1fb8a0;opacity:.6"></div>
+            <div class="ps-bar" style="height:80%;background:#1fb8a0;opacity:.7"></div>
+            <div class="ps-bar" style="height:65%;background:#1fb8a0;opacity:.6"></div>
+            <div class="ps-bar" style="height:100%;background:#c9a84c"></div>
+          </div>
+          <div class="ps-cats">
+            <div class="ps-cat"><div class="ps-cat-dot" style="background:#c9a84c"></div><span class="ps-cat-name">UPI Transfers</span><div class="ps-cat-bar-bg"><div class="ps-cat-fill" style="width:78%;background:#c9a84c"></div></div><span class="ps-cat-amt">₹18.4k</span></div>
+            <div class="ps-cat"><div class="ps-cat-dot" style="background:#e05c6a"></div><span class="ps-cat-name">Food & Dining</span><div class="ps-cat-bar-bg"><div class="ps-cat-fill" style="width:54%;background:#e05c6a"></div></div><span class="ps-cat-amt">₹12.8k</span></div>
+            <div class="ps-cat"><div class="ps-cat-dot" style="background:#7f77dd"></div><span class="ps-cat-name">Shopping</span><div class="ps-cat-bar-bg"><div class="ps-cat-fill" style="width:40%;background:#7f77dd"></div></div><span class="ps-cat-amt">₹9.6k</span></div>
+            <div class="ps-cat"><div class="ps-cat-dot" style="background:#1fb8a0"></div><span class="ps-cat-name">Transport</span><div class="ps-cat-bar-bg"><div class="ps-cat-fill" style="width:26%;background:#1fb8a0"></div></div><span class="ps-cat-amt">₹6.2k</span></div>
+          </div>
+          <div class="ps-insight"><p class="ps-insight-text">You spent <strong>30% more</strong> on food vs last month. Cutting ₹3k here adds ₹36k/year to savings.</p></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="loading-screen">
+  <div class="spin-ring"></div>
+  <h2 class="load-title">Reading your statement</h2>
+  <p class="load-sub">AI is going through every transaction</p>
+  <ul class="steps" id="lsteps">
+    <li class="active" id="s1"><span class="sdot"></span>Parsing transactions from PDF</li>
+    <li id="s2"><span class="sdot"></span>Categorising each spend</li>
+    <li id="s3"><span class="sdot"></span>Detecting patterns and habits</li>
+    <li id="s4"><span class="sdot"></span>Writing your plain-language summary</li>
+  </ul>
+</div>
+
+<div id="dashboard-screen">
+  <div class="dash-top">
+    <div>
+      <h1 class="dash-h1">Your money, explained</h1>
+      <p class="dash-period" id="dash-period">April 2025 · HDFC Savings Account</p>
+    </div>
+    <button class="btn-reset" onclick="resetApp()">↑ Upload new statement</button>
+  </div>
+  <div class="sum-grid">
+    <div class="sum-card"><p class="sum-lbl">Money In</p><p class="sum-val inc" id="v-inc">₹0</p><p class="sum-note">Salary + credits</p></div>
+    <div class="sum-card"><p class="sum-lbl">Money Out</p><p class="sum-val exp" id="v-exp">₹0</p><p class="sum-note">All debits</p></div>
+    <div class="sum-card"><p class="sum-lbl">Saved</p><p class="sum-val sav" id="v-sav">₹0</p><p class="sum-note" id="v-pct">of income</p></div>
+    <div class="sum-card"><p class="sum-lbl">Transactions</p><p class="sum-val neu" id="v-txn">0</p><p class="sum-note">This month</p></div>
+  </div>
+  <div class="ai-card">
+    <div class="ai-badge">AI</div>
+    <p class="ai-body" id="ai-text">Generating summary...</p>
+  </div>
+  <div class="chips-row" id="chips"></div>
+  <div class="two-col">
+    <div class="panel"><p class="panel-title">Where your money went</p><div id="cat-bars"></div></div>
+    <div class="panel"><p class="panel-title">Recent transactions</p><ul class="txn-list" id="txn-list"></ul></div>
+  </div>
+  <div class="panel"><p class="panel-title">Weekly spending pattern</p><div class="bar-chart" id="wchart"></div></div>
+</div>
+
+<script>
+const CC={'Food & Dining':'#e05c6a','UPI Transfers':'#c9a84c','Shopping':'#7f77dd','Transport':'#1fb8a0','Subscriptions':'#d4537e','Utilities':'#ef9f27','Healthcare':'#2eb87a','ATM/Cash':'#888780','Others':'#5f5e5a'};
+const CI={'Food & Dining':'🍽️','UPI Transfers':'📲','Shopping':'🛍️','Transport':'🚗','Subscriptions':'📺','Utilities':'💡','Healthcare':'💊','ATM/Cash':'💵','Others':'📦'};
+document.getElementById('file-input').addEventListener('change',e=>{if(e.target.files[0])processFile(e.target.files[0])});
+const dz=document.getElementById('dropzone');
+dz.addEventListener('dragover',e=>{e.preventDefault();dz.classList.add('drag')});
+dz.addEventListener('dragleave',()=>dz.classList.remove('drag'));
+dz.addEventListener('drop',e=>{e.preventDefault();dz.classList.remove('drag');if(e.dataTransfer.files[0])processFile(e.dataTransfer.files[0])});
+function processFile(file){
+  showScreen('loading');animSteps();
+  const r=new FileReader();
+  r.onload=async e=>{
+    const b64=e.target.result.split(',')[1];
+    try{
+      if(file.name.toLowerCase().endsWith('.csv'))await analyseAI(atob(b64),'csv');
+      else await analyseAI(b64,'pdf',file.type||'application/pdf');
+    }catch(err){console.error(err);demoData();}
+  };
+  r.readAsDataURL(file);
+}
+function animSteps(){
+  const ids=['s1','s2','s3','s4'];let i=0;
+  const iv=setInterval(()=>{
+    if(i>0)document.getElementById(ids[i-1]).className='done';
+    if(i<ids.length){document.getElementById(ids[i]).className='active';i++;}
+    else clearInterval(iv);
+  },1200);
+}
+async function analyseAI(data,type,mime){
+  const sys=`You are a personal finance AI for Indian users. Analyse the bank statement and return ONLY valid JSON:
+{"period":"Month Year","bank":"Bank Name","totalIncome":number,"totalExpense":number,"transactionCount":number,"categories":[{"name":"string","amount":number,"count":number}],"transactions":[{"name":"string max 30 chars","category":"string","amount":number,"type":"debit|credit","date":"DD MMM"}],"weeklySpend":[n,n,n,n],"aiSummary":"2-3 sentence plain language summary with rupee amounts","insights":[{"icon":"emoji","title":"short title","detail":"one line"}]}
+Categories: Food & Dining, UPI Transfers, Shopping, Transport, Subscriptions, Utilities, Healthcare, ATM/Cash, Others. Max 8 transactions. Max 4 insights. Return JSON only.`;
+  const msgs=type==='pdf'
+    ?[{role:'user',content:[{type:'document',source:{type:'base64',media_type:mime,data:data}},{type:'text',text:'Analyse this bank statement and return JSON.'}]}]
+    :[{role:'user',content:`Analyse this bank statement CSV:\n\n${data.substring(0,8000)}`}];
+  const res=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model:'claude-sonnet-4-20250514',max_tokens:1000,system:sys,messages:msgs})});
+  const d=await res.json();
+  const txt=d.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
+  renderDash(JSON.parse(txt));
+}
+function demoData(){renderDash({period:"April 2025",bank:"HDFC Savings Account",totalIncome:87500,totalExpense:61240,transactionCount:43,categories:[{name:"UPI Transfers",amount:18400,count:14},{name:"Food & Dining",amount:12800,count:9},{name:"Shopping",amount:9600,count:5},{name:"Transport",amount:6200,count:8},{name:"Subscriptions",amount:4840,count:4},{name:"Utilities",amount:5200,count:3},{name:"ATM/Cash",amount:4200,count:2}],transactions:[{name:"Zomato",category:"Food & Dining",amount:1240,type:"debit",date:"28 Apr"},{name:"Salary Credit",category:"Income",amount:87500,type:"credit",date:"27 Apr"},{name:"Amazon Shopping",category:"Shopping",amount:3499,type:"debit",date:"25 Apr"},{name:"Ola Cab",category:"Transport",amount:320,type:"debit",date:"24 Apr"},{name:"Netflix",category:"Subscriptions",amount:649,type:"debit",date:"22 Apr"},{name:"UPI — Rahul",category:"UPI Transfers",amount:2000,type:"debit",date:"20 Apr"},{name:"Electricity Bill",category:"Utilities",amount:1840,type:"debit",date:"18 Apr"},{name:"Swiggy",category:"Food & Dining",amount:870,type:"debit",date:"16 Apr"}],weeklySpend:[12400,18600,15800,14440],aiSummary:"You spent <strong>₹61,240</strong> of your ₹87,500 salary — saving a healthy <strong>30% (₹26,260)</strong> this month. Your biggest drain is <strong>UPI transfers</strong> at ₹18,400 across 14 payments worth reviewing. Food at ₹12,800 is above average; cutting 20% adds <strong>₹30,000/year</strong> to savings.",insights:[{icon:"📲",title:"UPI is your top spend",detail:"₹18,400 across 14 transfers — check who you're paying regularly"},{icon:"🍽️",title:"Food costs ₹426/day",detail:"₹12,800 on dining. Small cuts compound fast over a year."},{icon:"✅",title:"Savings rate: 30%",detail:"Healthy. Push to 35% by reviewing UPI transfers next month."},{icon:"📺",title:"4 active subscriptions",detail:"₹4,840/month. Worth auditing if you use all of them."}]})}
+function renderDash(d){
+  document.getElementById('dash-period').textContent=`${d.period} · ${d.bank}`;
+  document.getElementById('v-inc').textContent='₹'+d.totalIncome.toLocaleString('en-IN');
+  document.getElementById('v-exp').textContent='₹'+d.totalExpense.toLocaleString('en-IN');
+  const sav=Math.max(0,d.totalIncome-d.totalExpense);
+  const pct=Math.round((sav/d.totalIncome)*100);
+  document.getElementById('v-sav').textContent='₹'+sav.toLocaleString('en-IN');
+  document.getElementById('v-pct').textContent=pct+'% of income';
+  document.getElementById('v-txn').textContent=d.transactionCount;
+  document.getElementById('ai-text').innerHTML=d.aiSummary;
+  document.getElementById('chips').innerHTML=d.insights.map(i=>`<div class="chip"><span class="chip-icon">${i.icon}</span><p class="chip-title">${i.title}</p><p class="chip-detail">${i.detail}</p></div>`).join('');
+  const maxC=Math.max(...d.categories.map(c=>c.amount));
+  document.getElementById('cat-bars').innerHTML=d.categories.map(c=>`<div class="cat-row"><div class="cat-top"><span class="cat-name">${CI[c.name]||'📦'} ${c.name}</span><span class="cat-amt">₹${c.amount.toLocaleString('en-IN')}</span></div><div class="bar-bg"><div class="bar-fill" style="width:${Math.round(c.amount/maxC*100)}%;background:${CC[c.name]||'#888'}"></div></div></div>`).join('');
+  document.getElementById('txn-list').innerHTML=d.transactions.map(t=>`<li class="txn"><div class="txn-ico" style="background:${(CC[t.category]||'#888')}22">${CI[t.category]||'📦'}</div><div class="txn-info"><p class="txn-name">${t.name}</p><p class="txn-meta">${t.category} · ${t.date}</p></div><span class="txn-amt ${t.type==='debit'?'dr':'cr'}">${t.type==='debit'?'−':'+'}₹${t.amount.toLocaleString('en-IN')}</span></li>`).join('');
+  const maxW=Math.max(...d.weeklySpend);
+  const wks=['Wk 1','Wk 2','Wk 3','Wk 4'];
+  document.getElementById('wchart').innerHTML=d.weeklySpend.map((v,i)=>`<div class="bw"><span class="bval">₹${Math.round(v/1000)}k</span><div class="bbar" style="height:${Math.round(v/maxW*100)}%;background:${v===maxW?'#c9a84c':'#2a3760'}"></div><span class="blbl">${wks[i]}</span></div>`).join('');
+  showScreen('dashboard');
+}
+function showScreen(s){
+  document.getElementById('upload-screen').style.display=s==='upload'?'block':'none';
+  document.getElementById('loading-screen').style.display=s==='loading'?'block':'none';
+  document.getElementById('dashboard-screen').style.display=s==='dashboard'?'block':'none';
+}
+function resetApp(){
+  document.getElementById('file-input').value='';
+  ['s1','s2','s3','s4'].forEach((id,i)=>{document.getElementById(id).className=i===0?'active':''});
+  showScreen('upload');
+}
+</script>
+</body>
+</html>
