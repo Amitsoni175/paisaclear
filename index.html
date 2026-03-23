@@ -234,19 +234,17 @@ function animSteps(){
     else clearInterval(iv);
   },1200);
 }
-async function analyseAI(data, type, mime) {
-  const msgs = type === 'pdf'
-    ? [{ role: 'user', content: [{ type: 'document', source: { type: 'base64', media_type: mime, data: data } }, { type: 'text', text: 'Analyse this bank statement and return JSON.' }] }]
-    : [{ role: 'user', content: `Analyse this bank statement CSV:\n\n${data.substring(0, 8000)}` }];
-
-  const res = await fetch('/api/analyse', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ messages: msgs, type })
+async function analyseAI(data,type,mime){
+  const msgs=type==='pdf'
+    ?[{role:'user',content:[{type:'document',source:{type:'base64',media_type:mime,data:data}},{type:'text',text:'Analyse this bank statement and return JSON.'}]}]
+    :[{role:'user',content:`Analyse this bank statement CSV:\n\n${data.substring(0,8000)}`}];
+  const res=await fetch('/api/analyse',{
+    method:'POST',
+    headers:{'Content-Type':'application/json'},
+    body:JSON.stringify({messages:msgs,type})
   });
-
-  const d = await res.json();
-  const txt = d.content.map(c => c.text || '').join('').replace(/```json|```/g, '').trim();
+  const d=await res.json();
+  const txt=d.content.map(c=>c.text||'').join('').replace(/```json|```/g,'').trim();
   renderDash(JSON.parse(txt));
 }
 function demoData(){renderDash({period:"April 2025",bank:"HDFC Savings Account",totalIncome:87500,totalExpense:61240,transactionCount:43,categories:[{name:"UPI Transfers",amount:18400,count:14},{name:"Food & Dining",amount:12800,count:9},{name:"Shopping",amount:9600,count:5},{name:"Transport",amount:6200,count:8},{name:"Subscriptions",amount:4840,count:4},{name:"Utilities",amount:5200,count:3},{name:"ATM/Cash",amount:4200,count:2}],transactions:[{name:"Zomato",category:"Food & Dining",amount:1240,type:"debit",date:"28 Apr"},{name:"Salary Credit",category:"Income",amount:87500,type:"credit",date:"27 Apr"},{name:"Amazon Shopping",category:"Shopping",amount:3499,type:"debit",date:"25 Apr"},{name:"Ola Cab",category:"Transport",amount:320,type:"debit",date:"24 Apr"},{name:"Netflix",category:"Subscriptions",amount:649,type:"debit",date:"22 Apr"},{name:"UPI — Rahul",category:"UPI Transfers",amount:2000,type:"debit",date:"20 Apr"},{name:"Electricity Bill",category:"Utilities",amount:1840,type:"debit",date:"18 Apr"},{name:"Swiggy",category:"Food & Dining",amount:870,type:"debit",date:"16 Apr"}],weeklySpend:[12400,18600,15800,14440],aiSummary:"You spent <strong>₹61,240</strong> of your ₹87,500 salary — saving a healthy <strong>30% (₹26,260)</strong> this month. Your biggest drain is <strong>UPI transfers</strong> at ₹18,400 across 14 payments worth reviewing. Food at ₹12,800 is above average; cutting 20% adds <strong>₹30,000/year</strong> to savings.",insights:[{icon:"📲",title:"UPI is your top spend",detail:"₹18,400 across 14 transfers — check who you're paying regularly"},{icon:"🍽️",title:"Food costs ₹426/day",detail:"₹12,800 on dining. Small cuts compound fast over a year."},{icon:"✅",title:"Savings rate: 30%",detail:"Healthy. Push to 35% by reviewing UPI transfers next month."},{icon:"📺",title:"4 active subscriptions",detail:"₹4,840/month. Worth auditing if you use all of them."}]})}
